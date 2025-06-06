@@ -7,6 +7,7 @@ import (
 	"github.com/JSee98/Recallr/storage"
 )
 
+//go:generate mockgen -source=user_memory.go -destination=../mocks/mock_user_memory.go -package=mocks
 type UserMemory interface {
 	SetFact(userID, key, value string) error
 	GetFact(userID, key string) (string, error)

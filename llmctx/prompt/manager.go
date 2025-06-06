@@ -5,6 +5,12 @@ import (
 	"os"
 )
 
+//go:generate mockgen -source=manager.go -destination=../mocks/mock_prompt_manager.go -package=mocks
+type PromptManagerInterface interface{
+	// Reload prompts from environment variables.
+	Reload() error
+}
+
 // PromptManager holds all runtime prompts used by the LLM service.
 type PromptManager struct {
 	SystemPrompt string
