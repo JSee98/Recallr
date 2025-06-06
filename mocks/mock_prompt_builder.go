@@ -13,8 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	models "github.com/JSee98/Recallr/models"
-	types "github.com/JSee98/Recallr/types"
+	models "github.com/Jsee98/Recallr/models"
+	types "github.com/Jsee98/Recallr/types"
 	gomock "go.uber.org/mock/gomock"
 )
 

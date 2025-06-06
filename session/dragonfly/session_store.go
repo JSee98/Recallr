@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/JSee98/Recallr/models"
-	"github.com/JSee98/Recallr/storage"
+	"github.com/Jsee98/Recallr/models"
+	"github.com/Jsee98/Recallr/storage"
 )
 
 type DragonflySessionStore struct {

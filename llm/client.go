@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/JSee98/Recallr/models"
+	"github.com/Jsee98/Recallr/models"
 )
 
 //go:generate mockgen -source=client.go -destination=../mocks/mock_llm_client.go -package=mocks

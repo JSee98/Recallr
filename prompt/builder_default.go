@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/JSee98/Recallr/memory"
-	"github.com/JSee98/Recallr/models"
-	"github.com/JSee98/Recallr/session"
-	"github.com/JSee98/Recallr/types"
+	"github.com/Jsee98/Recallr/memory"
+	"github.com/Jsee98/Recallr/models"
+	"github.com/Jsee98/Recallr/session"
+	"github.com/Jsee98/Recallr/types"
 )
 
 type DefaultPromptBuilder struct {

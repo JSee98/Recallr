@@ -1,4 +1,4 @@
-module github.com/JSee98/Recallr
+module github.com/Jsee98/Recallr
 
 go 1.24.2
 

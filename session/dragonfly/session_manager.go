@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/JSee98/Recallr/models"
+	"github.com/Jsee98/Recallr/models"
 )
 
 type SessionManager struct {

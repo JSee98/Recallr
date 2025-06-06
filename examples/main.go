@@ -11,12 +11,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/JSee98/Recallr/chat"
-	"github.com/JSee98/Recallr/memory"
-	"github.com/JSee98/Recallr/models"
-	"github.com/JSee98/Recallr/prompt"
-	"github.com/JSee98/Recallr/session"
-	"github.com/JSee98/Recallr/storage/dragonfly"
+	"github.com/Jsee98/Recallr/chat"
+	"github.com/Jsee98/Recallr/memory"
+	"github.com/Jsee98/Recallr/models"
+	"github.com/Jsee98/Recallr/prompt"
+	"github.com/Jsee98/Recallr/session"
+	"github.com/Jsee98/Recallr/storage/dragonfly"
 )
 
 type OpenAICompatibleClient struct {

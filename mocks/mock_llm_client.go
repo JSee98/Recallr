@@ -14,7 +14,7 @@ import (
 	io "io"
 	reflect "reflect"
 
-	models "github.com/JSee98/Recallr/models"
+	models "github.com/Jsee98/Recallr/models"
 	gomock "go.uber.org/mock/gomock"
 )
 
