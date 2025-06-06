@@ -1,46 +1,98 @@
-# 🔁 Recallr
+# Recallr Chat Context Example
 
-**Persistent LLM chat memory, session context, and global user state for Golang.**  
-Drop-in memory infrastructure for building smart, context-aware LLM apps.
+This example demonstrates how to run an end-to-end chat interaction using the Recallr Golang library with:
 
----
-
-## 🚀 What is Recallr?
-
-Recallr is a lightweight, pluggable Go library that enables:
-
-- ✅ **Session memory** – track ongoing conversations
-- ✅ **Chat recovery** – restore full context after a session ends
-- ✅ **Global user memory** – build long-term user traits/preferences
-- ✅ **DiceDB-backed persistence** – fully local, fast, and embeddable
-- ✅ **Framework-free** – use with any LLM API or stack
-
-No Python. No extra servers. Just Go.
+- DragonflyDB as a Redis-compatible memory store
+- Long-term user memory
+- Session context tracking
+- Customizable prompt injection
+- Pluggable LLM clients (example uses a dummy echo client)
 
 ---
 
-## 🧠 Core Concepts
+## 🔧 Prerequisites
 
-| Component         | Description                                                                 |
-|------------------|-----------------------------------------------------------------------------|
-| `SessionManager` | Manages in-session chat memory                                              |
-| `ChatHistory`    | Stores and loads full chat histories per session                            |
-| `UserMemory`     | Long-term memory store with user facts, traits, preferences                 |
-| `PromptBuilder`  | Composes input prompts with memory, history, and current user message       |
-| `LLMClient`      | Interface wrapper to plug in OpenAI, local models, or anything else         |
+1. **Install [Docker](https://docs.docker.com/get-docker/)**
+2. **Run DragonflyDB locally**
+
+```bash
+docker run -d --name dragonfly -p 6379:6379 docker.dragonflydb.io/dragonflydb/dragonfly
+```
+
+3. **Clone Recallr**
+
+```bash
+git clone https://github.com/JSee98/Recallr
+cd Recallr
+```
+
+4. **Run Example**
+
+```bash
+go run examples/main.go
+```
 
 ---
 
-## 🛠️ Quick Start
+## 📦 What It Does
+
+- Starts a Dragonfly Redis instance.
+- Sets up session manager, user memory, and prompt manager.
+- Stores user facts into long-term memory.
+- Builds a prompt using the memory + last chat.
+- Sends the prompt to an LLM client (dummy echo used here).
+- Streams the assistant's response back line-by-line.
+- Stores the exchange in session memory.
+
+---
+
+## 💡 Prompt System
+
+Prompt variables are managed using environment variables:
+
+- `RECALLR_SYSTEM_PROMPT`: System-level instructions.
+- `RECALLR_USER_PROMPT`: Optional user prompt template.
+
+You can hot-reload these by calling `.Reload()` on `PromptManager`.
+
+---
+
+## 🧠 Fact Summarizer
+
+If the LLM client implements the following interface:
+
+```go
+type FactSummarizer interface {
+    Summarizer(ctx context.Context, facts map[string]string) (string, error)
+}
+```
+
+The orchestrator will use this to summarize user memory context into a compact string before sending the chat prompt.
+
+Otherwise, a default summarizer will generate:
 
 ```
-import "github.com/your-org/recallr"
-
-llm := recallr.New(recallr.Config{
-    Storage: DiceDBStore,
-    LLM:     OpenAIClient,
-})
-
-response := llm.Handle("user123", "session456", "What's the weather in Berlin?")
-fmt.Println(response)
+User Facts:
+- key1: value1
+- key2: value2
 ```
+
+---
+
+## 🧪 Testing & Extending
+
+Replace the `DummyLLMClient` with your own `llm.Client` implementation (e.g., OpenAI, Claude, etc.) to integrate real LLMs.
+
+---
+
+## 🧹 Cleanup
+
+```bash
+docker stop dragonfly && docker rm dragonfly
+```
+
+---
+
+## 📜 License
+
+MIT – see [LICENSE](./LICENSE)
