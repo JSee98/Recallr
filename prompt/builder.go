@@ -3,8 +3,8 @@ package prompt
 import (
 	"context"
 
-	"github.com/JSee98/Recallr/models"
-	"github.com/JSee98/Recallr/types"
+	"github.com/Jsee98/Recallr/models"
+	"github.com/Jsee98/Recallr/types"
 )
 
 //go:generate mockgen -source=builder.go -destination=../mocks/mock_prompt_builder.go -package=mocks

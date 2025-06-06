@@ -9,11 +9,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/JSee98/Recallr/llm"
-	"github.com/JSee98/Recallr/models"
-	"github.com/JSee98/Recallr/prompt"
-	"github.com/JSee98/Recallr/session"
-	"github.com/JSee98/Recallr/types"
+	"github.com/Jsee98/Recallr/llm"
+	"github.com/Jsee98/Recallr/models"
+	"github.com/Jsee98/Recallr/prompt"
+	"github.com/Jsee98/Recallr/session"
+	"github.com/Jsee98/Recallr/types"
 )
 
 type StreamResult struct {

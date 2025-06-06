@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JSee98/Recallr/mocks"
-	"github.com/JSee98/Recallr/models"
+	"github.com/Jsee98/Recallr/mocks"
+	"github.com/Jsee98/Recallr/models"
 	"go.uber.org/mock/gomock"
 )
 

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-//go:generate mockgen -destination=../mocks/store_mock.go -package=mocks github.com/JSee98/Recallr/storage Store
+//go:generate mockgen -destination=../mocks/store_mock.go -package=mocks github.com/Jsee98/Recallr/storage Store
 type Store interface {
 	// Basic key-value operations
 	Set(ctx context.Context, key string, value string, expiration time.Duration) error

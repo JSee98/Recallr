@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/JSee98/Recallr/constants"
+	"github.com/Jsee98/Recallr/constants"
 	"github.com/redis/go-redis/v9"
 )
 

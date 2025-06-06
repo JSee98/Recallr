@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/JSee98/Recallr/storage"
+	"github.com/Jsee98/Recallr/storage"
 )
 
 //go:generate mockgen -source=user_memory.go -destination=../mocks/mock_user_memory.go -package=mocks

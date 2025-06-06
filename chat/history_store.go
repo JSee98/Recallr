@@ -3,7 +3,7 @@ package chat
 import (
 	"time"
 
-	"github.com/JSee98/Recallr/models"
+	"github.com/Jsee98/Recallr/models"
 )
 
 type ChatHistoryStore interface {

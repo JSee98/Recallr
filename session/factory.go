@@ -1,9 +1,9 @@
 package session
 
 import (
-	"github.com/JSee98/Recallr/constants"
-	"github.com/JSee98/Recallr/session/dragonfly"
-	"github.com/JSee98/Recallr/storage"
+	"github.com/Jsee98/Recallr/constants"
+	"github.com/Jsee98/Recallr/session/dragonfly"
+	"github.com/Jsee98/Recallr/storage"
 )
 
 func NewSessionManager(storageLayer storage.Store) SessionManager {

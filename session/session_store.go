@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/JSee98/Recallr/models"
+	"github.com/Jsee98/Recallr/models"
 )
 
 type SessionStore interface {

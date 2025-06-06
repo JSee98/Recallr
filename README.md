@@ -22,7 +22,7 @@ docker run -d --name dragonfly -p 6379:6379 docker.dragonflydb.io/dragonflydb/dr
 3. **Clone Recallr**
 
 ```bash
-git clone https://github.com/JSee98/Recallr
+git clone https://github.com/Jsee98/Recallr
 cd Recallr
 ```
 
