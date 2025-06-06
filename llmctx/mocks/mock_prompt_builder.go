@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/JSee98/Recallr/models"
+	types "github.com/JSee98/Recallr/types"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,16 +43,16 @@ func (m *MockBuilder) EXPECT() *MockBuilderMockRecorder {
 }
 
 // BuildPrompt mocks base method.
-func (m *MockBuilder) BuildPrompt(ctx context.Context, sessionID, userID, currentInput string, messageLimit int) ([]models.Message, error) {
+func (m *MockBuilder) BuildPrompt(ctx context.Context, sessionID, userID, currentInput string, messageLimit int, summarizerFunction types.SummarizerFunction) ([]models.Message, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BuildPrompt", ctx, sessionID, userID, currentInput, messageLimit)
+	ret := m.ctrl.Call(m, "BuildPrompt", ctx, sessionID, userID, currentInput, messageLimit, summarizerFunction)
 	ret0, _ := ret[0].([]models.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // BuildPrompt indicates an expected call of BuildPrompt.
-func (mr *MockBuilderMockRecorder) BuildPrompt(ctx, sessionID, userID, currentInput, messageLimit any) *gomock.Call {
+func (mr *MockBuilderMockRecorder) BuildPrompt(ctx, sessionID, userID, currentInput, messageLimit, summarizerFunction any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildPrompt", reflect.TypeOf((*MockBuilder)(nil).BuildPrompt), ctx, sessionID, userID, currentInput, messageLimit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildPrompt", reflect.TypeOf((*MockBuilder)(nil).BuildPrompt), ctx, sessionID, userID, currentInput, messageLimit, summarizerFunction)
 }

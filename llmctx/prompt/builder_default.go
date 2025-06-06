@@ -7,6 +7,7 @@ import (
 	"github.com/JSee98/Recallr/memory"
 	"github.com/JSee98/Recallr/models"
 	"github.com/JSee98/Recallr/session"
+	"github.com/JSee98/Recallr/types"
 )
 
 type DefaultPromptBuilder struct {
@@ -23,7 +24,7 @@ func NewDefaultPromptBuilder(pm *PromptManager, sm session.SessionManager, um me
 	}
 }
 
-func (pb *DefaultPromptBuilder) BuildPrompt(ctx context.Context, sessionID, userID, currentInput string, messageLimit int) ([]models.Message, error) {
+func (pb *DefaultPromptBuilder) BuildPrompt(ctx context.Context, sessionID, userID, currentInput string, messageLimit int, summarizerFunction types.SummarizerFunction) ([]models.Message, error) {
 	messages := []models.Message{}
 
 	// 1. Add system prompt
@@ -34,7 +35,10 @@ func (pb *DefaultPromptBuilder) BuildPrompt(ctx context.Context, sessionID, user
 
 	// 2. Inject long-term memory
 	if facts, err := pb.UserMemory.ListFacts(userID); err == nil && len(facts) > 0 {
-		content := formatFactsAsContext(facts)
+		content, err := summarizerFunction(ctx, facts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to summarize facts: %w", err)
+		}
 		messages = append(messages, models.Message{
 			Role:    "system",
 			Content: content,
