@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -15,31 +19,80 @@ import (
 	"github.com/JSee98/Recallr/storage/dragonfly"
 )
 
-type DummyLLMClient struct{}
-
-func (d *DummyLLMClient) StreamChat(ctx context.Context, messages []models.Message) (io.ReadCloser, error) {
-	pr, pw := io.Pipe()
-	go func() {
-		for _, msg := range messages {
-			if msg.Role == "user" {
-				pw.Write([]byte("Echo: " + msg.Content + "\n"))
-			}
-		}
-		pw.Close()
-	}()
-	return pr, nil
+type OpenAICompatibleClient struct {
+	APIKey string
+	APIURL string // e.g., https://api.openai.com/v1/chat/completions
+	Model  string
 }
 
-func (d *DummyLLMClient) Chat(ctx context.Context, messages []models.Message) (*models.Message, error) {
-	return &models.Message{
-		ID:      "m1",
-		Role:    "assistant",
-		Content: "Echo response",
-		Time:    time.Now(),
-	}, nil
+func NewOpenAICompatibleClient(apiKey, apiURL, model string) *OpenAICompatibleClient {
+	return &OpenAICompatibleClient{
+		APIKey: apiKey,
+		APIURL: apiURL,
+		Model:  model,
+	}
 }
 
-func (d *DummyLLMClient) Name() string { return "dummy" }
+func (c *OpenAICompatibleClient) Name() string {
+	return "openai"
+}
+
+func (c *OpenAICompatibleClient) Chat(ctx context.Context, messages []models.Message) (*models.Message, error) {
+	reqBody := map[string]interface{}{
+		"model":    c.Model,
+		"messages": messages,
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req, _ := http.NewRequestWithContext(ctx, "POST", c.APIURL, bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+c.APIKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Choices []struct {
+			Message models.Message `json:"message"`
+		} `json:"choices"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+	if len(result.Choices) == 0 {
+		return nil, fmt.Errorf("no choices returned")
+	}
+	return &result.Choices[0].Message, nil
+}
+
+func (c *OpenAICompatibleClient) StreamChat(ctx context.Context, messages []models.Message) (io.ReadCloser, error) {
+	payload := map[string]interface{}{
+		"model":    c.Model,
+		"stream":   true,
+		"messages": messages,
+	}
+	body, _ := json.Marshal(payload)
+
+	req, _ := http.NewRequestWithContext(ctx, "POST", c.APIURL, bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+c.APIKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		msg, _ := io.ReadAll(resp.Body)
+		defer resp.Body.Close()
+		return nil, fmt.Errorf("stream request failed: %s", msg)
+	}
+
+	return resp.Body, nil
+}
 
 func main() {
 	os.Setenv("RECALLR_SYSTEM_PROMPT", "You are a helpful assistant.")
@@ -57,7 +110,7 @@ func main() {
 	userMem := memory.NewUserMemory(redisStore)
 	promptMgr := prompt.NewPromptManager()
 	builder := prompt.NewDefaultPromptBuilder(promptMgr, sessionMgr, userMem)
-	llmClient := &DummyLLMClient{}
+	llmClient := NewOpenAICompatibleClient("YOUR_KEY", "https://api.deepinfra.com/v1/openai/chat/completions", "deepseek-ai/DeepSeek-V3")
 
 	// 3. Chat orchestrator
 	orchestrator := chat.NewDefaultOrchestrator(sessionMgr, builder, llmClient)
@@ -72,18 +125,31 @@ func main() {
 
 	// Handle input
 	ctx := context.Background()
-	output, errs := orchestrator.HandleUserInput(ctx, sessionID, userID, "What's my profile?")
-
-	for {
-		select {
-		case line, ok := <-output:
-			if !ok {
-				return
-			}
-			fmt.Print(line)
-		case err := <-errs:
-			fmt.Println("Error:", err)
-			return
-		}
+	res, err := orchestrator.HandleUserInput(ctx, sessionID, userID, "What's the capital of France?")
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer res.Stream.Close()
+
+	go func() {
+		for err := range res.Errors {
+			fmt.Println("stream error:", err)
+		}
+	}()
+
+	go func() {
+		for {
+			buf := make([]byte, 256)
+			n, err := res.Stream.Read(buf)
+			if n > 0 {
+				fmt.Print(string(buf[:n]))
+			}
+			if err != nil {
+				break
+			}
+		}
+	}()
+
+	final := <-res.FinalMessage
+	fmt.Println("full assistant message:", final.Content)
 }
