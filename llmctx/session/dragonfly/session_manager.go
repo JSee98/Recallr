@@ -9,14 +9,14 @@ import (
 )
 
 type SessionManager struct {
-	storage *DragonflySessionStore 
-	ctx   context.Context
+	storage *DragonflySessionStore
+	ctx     context.Context
 }
 
 func NewSessionManager(storage *DragonflySessionStore) *SessionManager {
 	return &SessionManager{
 		storage: storage,
-		ctx:   context.Background(),
+		ctx:     context.Background(),
 	}
 }
 

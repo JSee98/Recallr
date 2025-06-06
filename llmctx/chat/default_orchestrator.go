@@ -37,10 +37,21 @@ func (o *DefaultOrchestrator) HandleUserInput(ctx context.Context, sessionID, us
 		defer close(out)
 		defer close(errs)
 
-		prompt, err := o.PromptBuilder.BuildPrompt(ctx, sessionID, userID, userInput, 10)
-		if err != nil {
-			errs <- fmt.Errorf("failed to build prompt: %w", err)
-			return
+		promptToSend := make([]models.Message, 0)
+		if summarizer, ok := o.LLMClient.(prompt.FactSummarizer); ok {
+			fetchedPrompts, err := o.PromptBuilder.BuildPrompt(ctx, sessionID, userID, userInput, 10, summarizer.Summarizer)
+			if err != nil {
+				errs <- fmt.Errorf("failed to build prompt: %w", err)
+				return
+			}
+			promptToSend = append(promptToSend, fetchedPrompts...)
+		} else {
+			fetchedPrompts, err := o.PromptBuilder.BuildPrompt(ctx, sessionID, userID, userInput, 10, prompt.DefaultSummarizer)
+			if err != nil {
+				errs <- fmt.Errorf("failed to build prompt: %w", err)
+				return
+			}
+			promptToSend = append(promptToSend, fetchedPrompts...)
 		}
 
 		userMsg := models.Message{
@@ -55,7 +66,7 @@ func (o *DefaultOrchestrator) HandleUserInput(ctx context.Context, sessionID, us
 			return
 		}
 
-		stream, err := o.LLMClient.StreamChat(ctx, prompt)
+		stream, err := o.LLMClient.StreamChat(ctx, promptToSend)
 		if err != nil {
 			errs <- fmt.Errorf("stream error: %w", err)
 			return
